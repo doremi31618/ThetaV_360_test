@@ -6,6 +6,7 @@ using Kvant;
 public class test : MonoBehaviour {
     public JObject jObject ;
     public GameObject GrassInstance;
+
     Grass grass;
     public bool isUseWeatherStaion = true;
 	// Use this for initialization
