@@ -4,19 +4,27 @@ using UnityEngine;
 using WeatherStation;
 using Kvant;
 
-public class SingletonWeatherStationData : MonoBehaviour {
-    
-    private static SingletonWeatherStationData singleton ;
-    public SingletonWeatherStationData Instance
-    {
-        get{
-            if (singleton == null)
-                singleton = this;
-            return singleton;
-        }
-    }
-    [Header("風力等級 (Beaufort scale) : 0 ~ 12")]
-    Beaufort_scale windLevel = Beaufort_scale.calm;
+public class SingletonWeatherStationData : MonoBehaviour
+{
+    #region attribute
+
+
+    [Header("環境風參數")]
+
+    [Range(0, 360)]
+    public int WindDirction = 0;
+    [Range(0, 50)]
+    public float AverageWindSpeed = 0;
+    [Range(0, 50)]
+    public float MaxWindSpeed = 0;
+
+    private float currentWindSpeed = 0;
+
+    public Beaufort_scale windLevel = Beaufort_scale.calm;
+
+    /// <summary>
+    /// 風力等級 (Beaufort scale) : 0 ~ 12
+    /// </summary>
     public enum Beaufort_scale
     {
         /// <summary>
@@ -77,7 +85,7 @@ public class SingletonWeatherStationData : MonoBehaviour {
         /// <summary>
         /// level 8
         /// wind speed : 17.2-20.7
-        // 小樹枝被吹折，步行不能前進。
+        /// 小樹枝被吹折，步行不能前進。
         /// </summary>
         gale,
 
@@ -110,17 +118,18 @@ public class SingletonWeatherStationData : MonoBehaviour {
 
     }
 
-    [Range(0, 360)] 
-    public int WindDirction = 0;
-    [Range(0, 50)]
-    public float AverageWindSpeed = 0;
-    [Range(0, 50)]
-    public float MaxWindSpeed = 0;
+
+    [Header("氣象站參數")]
 
     [Tooltip("如果使用氣象站資料作為輸入，將不採用上面資料")]
     public bool isUseWeatherStaion = true;
 
+    [Tooltip("多久讀取一次氣象站資料")]
     public float readSpeed = 15.0f;
+
+    [Header("遊戲物件參數")]
+    public GameObject Balloon;
+    public GameObject GrassInstance;
     /*
     public float OneHourRainFall;
 
@@ -134,10 +143,22 @@ public class SingletonWeatherStationData : MonoBehaviour {
     */
 
     public JObject jObject;
-    public GameObject GrassInstance;
+
+    private static SingletonWeatherStationData singleton;
+    public SingletonWeatherStationData Instance
+    {
+        get
+        {
+            if (singleton == null)
+                singleton = this;
+            return singleton;
+        }
+    }
 
     Grass grass;
     UniStormSystem unistorm;
+    #endregion
+    #region Unity funtion
 
     // Use this for initialization
     void Start()
@@ -146,11 +167,12 @@ public class SingletonWeatherStationData : MonoBehaviour {
         grass = GrassInstance.GetComponent<Grass>();
         unistorm = GameObject.FindWithTag("UniStorm").GetComponent<UniStormSystem>();
 
-        //grass.rotationNoiseAxis = new Vector3(1, 0, 0);
-        //grass.rotationNoiseSpeed = 1;
+        if(Balloon == null)
+        {
+            Balloon = new GameObject();
+            Balloon.AddComponent<FloatingObjects>();
 
-        //LoadData.ReadFileFromInternet(jObject);
-        //StartCoroutine(_ReadFileFromInternet(jObject));
+        }
 
 
         if (isUseWeatherStaion)
@@ -165,6 +187,13 @@ public class SingletonWeatherStationData : MonoBehaviour {
 
     }
 
+    private void Update()
+    {
+
+    }
+
+    #endregion
+    #region IEnumerator
     IEnumerator DataManager()
     {
         jObject = LoadData.GameData;
@@ -181,17 +210,11 @@ public class SingletonWeatherStationData : MonoBehaviour {
 
             if (jObject.Feeds.Count >= 1)
             {
-                //grass.rotationNoiseAxis = new Vector3(
-                //Mathf.Cos(jObject.Feeds[jObject.Feeds.Count - 1].field1 * 3.141f/360),
-                //0,
-                //Mathf.Sin(jObject.Feeds[jObject.Feeds.Count - 1].field1 * 3.141f/360));
-                grass.rotationNoiseAxis = new Vector3(
-                    Mathf.Sin(jObject.Feeds[jObject.Feeds.Count - 1].field1 * Mathf.Deg2Rad),
-                              0,
-                    Mathf.Cos(jObject.Feeds[jObject.Feeds.Count - 1].field1 * Mathf.Deg2Rad)
-                );
+                WindDataTransfer(jObject.Feeds[jObject.Feeds.Count - 1].field2, 
+                                 jObject.Feeds[jObject.Feeds.Count - 1].field3, 
+                                 jObject.Feeds[jObject.Feeds.Count - 1].field1);
+                GrassAttributeByWind(WindDirction);
 
-                grass.rotationNoiseSpeed = 1;
                 Debug.Log("Axis : " + jObject.Feeds[jObject.Feeds.Count - 1].field1);
                 Debug.Log("Rotation Noise Axis : " + grass.rotationNoiseAxis);
             }
@@ -204,13 +227,117 @@ public class SingletonWeatherStationData : MonoBehaviour {
     {
         while (true)
         {
-            grass.rotationNoiseAxis = new Vector3(
-                Random.Range(0, 5),
-                0,
-                Random.Range(0, 5));
-            grass.rotationNoiseSpeed = Random.Range(1, 5);
-            yield return new WaitForSeconds(15f);
+            //float degree = Mathf.PerlinNoise(Time.time, 0) * 360;
+            WindDataTransfer(AverageWindSpeed, MaxWindSpeed, WindDirction);
+            GrassAttributeByWind(WindDirction);
+
+
+            yield return new WaitForSeconds(1f);
         }
     }
+#endregion
+    void GrassAttributeByWind(float _WindDirection)
+    {
+        grass.rotationNoiseAxis = new Vector3(
+            Mathf.Sin(_WindDirection * Mathf.Deg2Rad),0,
+            Mathf.Cos(_WindDirection * Mathf.Deg2Rad));
+
+        grass.rotationNoiseSpeed = WindSpeedToRotationNoiseSpeed(windLevel);
+        AdjustRandomPitchAndNoiseToRandomPitch();
+
+
+    }
+    void AdjustRandomPitchAndNoiseToRandomPitch()
+    {
+        float _randomPitchAngle = 0;
+        float _noisePitchAngle = 0;
+
+        grass.randomPitchAngle = _randomPitchAngle;
+        grass.noisePitchAngle = _noisePitchAngle;
+    }
+    float WindSpeedToRotationNoiseSpeed(Beaufort_scale _windLevel)
+    {
+        float rotationNoiseSpeed = 0;
+        if((int)_windLevel <= 4)
+        {
+            rotationNoiseSpeed = Mathf.Lerp(1, 2, ((float)_windLevel)/4f);
+        }
+        else if(4<(int)_windLevel && (int) _windLevel <= 9 )
+        {
+            rotationNoiseSpeed = Mathf.Lerp(2, 3, ((float)_windLevel - 4)/5f);
+        }
+        else if(9 < (int)_windLevel)
+        {
+            rotationNoiseSpeed = Mathf.Lerp(3, 5, ((float)_windLevel - 9)/3f);
+        }
+        return rotationNoiseSpeed;
+    }
+
+    void WindDataTransfer(float _AverageWindSpeed,float _MaxWindSpeed ,float _WindDirection)
+    {
+        AverageWindSpeed = _AverageWindSpeed;
+        MaxWindSpeed = _MaxWindSpeed;
+        WindDirction = (int)Mathf.Floor(_WindDirection);
+        currentWindSpeed = Mathf.PerlinNoise(Time.deltaTime, 0) * (MaxWindSpeed - AverageWindSpeed) + AverageWindSpeed;
+        windLevelIdentifier(AverageWindSpeed);
+    }
+
+    void windLevelIdentifier(float _windSpeed)
+    {
+        AverageWindSpeed = _windSpeed;
+        if(AverageWindSpeed <= 0.3f)
+        {
+            windLevel = Beaufort_scale.calm;
+        }
+        else if(0.3f < AverageWindSpeed && AverageWindSpeed<= 1.5f)
+        {
+            windLevel = Beaufort_scale.light_air;
+        }
+        else if(1.5f < AverageWindSpeed && AverageWindSpeed <= 3.3f)
+        {
+            windLevel = Beaufort_scale.light_breeze;
+        }
+        else if(3.3f < AverageWindSpeed && AverageWindSpeed <= 5.4f)
+        {
+            windLevel = Beaufort_scale.gentle_breeze;
+        }
+        else if(5.4f < AverageWindSpeed && AverageWindSpeed <= 7.9f)
+        {
+            windLevel = Beaufort_scale.moderate_breeze;
+        }
+        else if(7.9f < AverageWindSpeed && AverageWindSpeed <=  10.7f)
+        {
+            windLevel = Beaufort_scale.fresh_breeze;
+        }
+        else if(10.7f < AverageWindSpeed && AverageWindSpeed <= 13.8f)
+        {
+            windLevel = Beaufort_scale.strong_breeze;
+        }
+        else if(13.8f < AverageWindSpeed && AverageWindSpeed <= 17.1f)
+        {
+            windLevel = Beaufort_scale.near_gale;
+        }
+        else if(17.1f < AverageWindSpeed && AverageWindSpeed <= 20.7f)
+        {
+            windLevel = Beaufort_scale.gale;
+        }
+        else if(20.7f < AverageWindSpeed && AverageWindSpeed <= 24.4f)
+        {
+            windLevel = Beaufort_scale.strong_gale;
+        }
+        else if(24.4f < AverageWindSpeed && AverageWindSpeed <= 28.4f)
+        {
+            windLevel = Beaufort_scale.storm;
+        }
+        else if(28.4f < AverageWindSpeed && AverageWindSpeed <= 32.6f)
+        {
+            windLevel = Beaufort_scale.violent_storm;
+        }
+        else
+        {
+            windLevel = Beaufort_scale.hurricane;
+        }
+    }
+
 
 }

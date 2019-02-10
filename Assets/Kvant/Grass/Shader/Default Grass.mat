@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: Default Grass
   m_Shader: {fileID: 4800000, guid: da73fcaab82534881adec3f5f772b88a, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _NORMALMAP
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -23,7 +23,7 @@ Material:
         m_Scale: {x: 1.7, y: 2}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 9e3930dc2759048d59ceab73bfa51f28, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -46,12 +46,12 @@ Material:
     - _ColorMode: 1
     - _HeightToOcc: 5.263158
     - _Metallic: 0
-    - _NormalScale: 0.5
-    - _OccExp: 2.74
+    - _NormalScale: 0
+    - _OccExp: 10
     - _OccHeight: 0.19
-    - _OccToColor: 0.459
+    - _OccToColor: 0.488
     - _OcclusionStr: 1
-    - _Smoothness: 0.4
+    - _Smoothness: 0.588
     m_Colors:
-    - _Color: {r: 0.16446799, g: 0.8602941, b: 0.31323227, a: 1}
-    - _Color2: {r: 0.52751124, g: 0.75, b: 0.10477942, a: 1}
+    - _Color: {r: 0.17817727, g: 0.49056602, b: 0.24524377, a: 1}
+    - _Color2: {r: 0.55802774, g: 0.7735849, b: 0.14231044, a: 1}
