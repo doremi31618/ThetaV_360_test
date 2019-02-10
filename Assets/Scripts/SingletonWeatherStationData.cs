@@ -243,14 +243,37 @@ public class SingletonWeatherStationData : MonoBehaviour
             Mathf.Cos(_WindDirection * Mathf.Deg2Rad));
 
         grass.rotationNoiseSpeed = WindSpeedToRotationNoiseSpeed(windLevel);
-        AdjustRandomPitchAndNoiseToRandomPitch();
+        AdjustRandomPitchAndNoiseToRandomPitch(windLevel);
 
 
     }
-    void AdjustRandomPitchAndNoiseToRandomPitch()
+    void AdjustRandomPitchAndNoiseToRandomPitch(Beaufort_scale _windLevel)
     {
         float _randomPitchAngle = 0;
         float _noisePitchAngle = 0;
+
+        if ((int)_windLevel <= 4)
+        {
+            _randomPitchAngle = Mathf.SmoothStep(0, 8.7f, ((float)_windLevel) / 4f);
+            _noisePitchAngle = Mathf.SmoothStep(0.5f, 4.6f, ((float)_windLevel) / 4f);
+
+        }
+        else if (4 < (int)_windLevel && (int)_windLevel <= 6)
+        {
+            _randomPitchAngle = Mathf.SmoothStep(8.7f, 27f, ((float)_windLevel - 4) / 2f);
+            _noisePitchAngle = Mathf.SmoothStep(4.6f, 50f, ((float)_windLevel- 4) / 2f);
+        }
+        else if (6 < (int)_windLevel && (int)_windLevel <= 9)
+        {
+            _randomPitchAngle = Mathf.SmoothStep(27, 66.2f, ((float)_windLevel - 6) / 3f);
+            _noisePitchAngle = Mathf.SmoothStep(50, 71, ((float)_windLevel - 6) / 3f);
+        }
+        else if (9 < (int)_windLevel)
+        {
+            _randomPitchAngle = Mathf.SmoothStep(66.2f, 90, ((float)_windLevel - 9) / 3f);
+            _noisePitchAngle =Mathf.SmoothStep(71,90, ((float)_windLevel- 9) / 3f);
+
+        }
 
         grass.randomPitchAngle = _randomPitchAngle;
         grass.noisePitchAngle = _noisePitchAngle;
@@ -260,15 +283,15 @@ public class SingletonWeatherStationData : MonoBehaviour
         float rotationNoiseSpeed = 0;
         if((int)_windLevel <= 4)
         {
-            rotationNoiseSpeed = Mathf.Lerp(1, 2, ((float)_windLevel)/4f);
+            rotationNoiseSpeed = Mathf.SmoothStep(1, 2, ((float)_windLevel)/4f);
         }
         else if(4<(int)_windLevel && (int) _windLevel <= 9 )
         {
-            rotationNoiseSpeed = Mathf.Lerp(2, 3, ((float)_windLevel - 4)/5f);
+            rotationNoiseSpeed = Mathf.SmoothStep(2, 3, ((float)_windLevel - 4)/5f);
         }
         else if(9 < (int)_windLevel)
         {
-            rotationNoiseSpeed = Mathf.Lerp(3, 5, ((float)_windLevel - 9)/3f);
+            rotationNoiseSpeed = Mathf.SmoothStep(3, 5, ((float)_windLevel - 9)/3f);
         }
         return rotationNoiseSpeed;
     }
