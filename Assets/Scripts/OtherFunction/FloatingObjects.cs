@@ -5,10 +5,14 @@ public class FloatingObjects : MonoBehaviour
     
     [Range(5,6)]public float floatingSpeed = 5.5f;
 
-    [Range(0,10)]public int windLevel = 0;
+    //Range(0,10)]public int windLevel = 0;
 
     [Tooltip("以氣象站為中心的方向")]
     [Range(0,360)]public float windDirection = 90;
+
+    public bool isUseWeatherStationData = true;
+    [Tooltip("It will auto search the object with (WeatherStaion tag)")]
+    public SingletonWeatherStationData m_WeatherData;
 
     private float radian = 0;//弧度
     private float perRadian = 0.2f;//每次变化的弧度
@@ -18,6 +22,13 @@ public class FloatingObjects : MonoBehaviour
 
     public bool floatingUp = true;
 
+    private void Awake()
+    {
+        if(m_WeatherData == null && isUseWeatherStationData)
+        {
+            m_WeatherData = GameObject.FindWithTag("WeatherStation").GetComponent<SingletonWeatherStationData>();
+        }
+    }
 
     void Start()
     {
@@ -26,6 +37,11 @@ public class FloatingObjects : MonoBehaviour
 
     void Update()
     {
+        if(isUseWeatherStationData)
+        {
+            GetWeatherStationData();
+        }
+
         if(floatingUp)
         {
             Vector3 movingTowardDir = new Vector3(Mathf.Sin(Mathf.Deg2Rad * windDirection), 0, Mathf.Cos(Mathf.Deg2Rad * windDirection));
@@ -45,4 +61,9 @@ public class FloatingObjects : MonoBehaviour
             transform.localEulerAngles += new Vector3(0, 1f, 0);
     }
 
+    void GetWeatherStationData()
+    {
+        floatingSpeed = m_WeatherData.AverageWindSpeed;
+        windDirection = m_WeatherData.WindDirction;
+    }
 }

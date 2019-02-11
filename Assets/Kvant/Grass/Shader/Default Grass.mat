@@ -47,11 +47,11 @@ Material:
     - _HeightToOcc: 5.263158
     - _Metallic: 0
     - _NormalScale: 0
-    - _OccExp: 10
+    - _OccExp: 1
     - _OccHeight: 0.19
-    - _OccToColor: 0.488
+    - _OccToColor: 0.418
     - _OcclusionStr: 1
-    - _Smoothness: 0.588
+    - _Smoothness: 0.635
     m_Colors:
     - _Color: {r: 0.17817727, g: 0.49056602, b: 0.24524377, a: 1}
     - _Color2: {r: 0.55802774, g: 0.7735849, b: 0.14231044, a: 1}

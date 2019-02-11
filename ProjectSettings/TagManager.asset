@@ -9,6 +9,7 @@ TagManager:
   - Middle
   - near
   - UniStorm
+  - WeatherStation
   layers:
   - Default
   - TransparentFX

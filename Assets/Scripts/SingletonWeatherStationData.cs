@@ -130,6 +130,7 @@ public class SingletonWeatherStationData : MonoBehaviour
     [Header("遊戲物件參數")]
     public GameObject Balloon;
     public GameObject GrassInstance;
+    public WindZone treeWindZone;
     /*
     public float OneHourRainFall;
 
@@ -159,6 +160,14 @@ public class SingletonWeatherStationData : MonoBehaviour
     UniStormSystem unistorm;
     #endregion
     #region Unity funtion
+
+    private void Awake()
+    {
+        if (treeWindZone == null)
+        {
+            treeWindZone = GameObject.Find("UniStorm Windzone").GetComponent<WindZone>();
+        }
+    }
 
     // Use this for initialization
     void Start()
@@ -244,8 +253,6 @@ public class SingletonWeatherStationData : MonoBehaviour
 
         grass.rotationNoiseSpeed = WindSpeedToRotationNoiseSpeed(windLevel);
         AdjustRandomPitchAndNoiseToRandomPitch(windLevel);
-
-
     }
     void AdjustRandomPitchAndNoiseToRandomPitch(Beaufort_scale _windLevel)
     {
@@ -254,24 +261,24 @@ public class SingletonWeatherStationData : MonoBehaviour
 
         if ((int)_windLevel <= 4)
         {
-            _randomPitchAngle = Mathf.SmoothStep(0, 8.7f, ((float)_windLevel) / 4f);
+            _randomPitchAngle = Mathf.SmoothStep(0, 6f, ((float)_windLevel) / 4f);
             _noisePitchAngle = Mathf.SmoothStep(0.5f, 4.6f, ((float)_windLevel) / 4f);
 
         }
         else if (4 < (int)_windLevel && (int)_windLevel <= 6)
         {
-            _randomPitchAngle = Mathf.SmoothStep(8.7f, 27f, ((float)_windLevel - 4) / 2f);
-            _noisePitchAngle = Mathf.SmoothStep(4.6f, 50f, ((float)_windLevel- 4) / 2f);
+            _randomPitchAngle = Mathf.SmoothStep(6f, 20f, ((float)_windLevel - 4) / 2f);
+            _noisePitchAngle = Mathf.SmoothStep(4.6f, 30f, ((float)_windLevel- 4) / 2f);
         }
         else if (6 < (int)_windLevel && (int)_windLevel <= 9)
         {
-            _randomPitchAngle = Mathf.SmoothStep(27, 66.2f, ((float)_windLevel - 6) / 3f);
-            _noisePitchAngle = Mathf.SmoothStep(50, 71, ((float)_windLevel - 6) / 3f);
+            _randomPitchAngle = Mathf.SmoothStep(20, 66.2f, ((float)_windLevel - 6) / 3f);
+            _noisePitchAngle = Mathf.SmoothStep(30, 45, ((float)_windLevel - 6) / 3f);
         }
         else if (9 < (int)_windLevel)
         {
             _randomPitchAngle = Mathf.SmoothStep(66.2f, 90, ((float)_windLevel - 9) / 3f);
-            _noisePitchAngle =Mathf.SmoothStep(71,90, ((float)_windLevel- 9) / 3f);
+            _noisePitchAngle =Mathf.SmoothStep(45,60, ((float)_windLevel- 9) / 3f);
 
         }
 
