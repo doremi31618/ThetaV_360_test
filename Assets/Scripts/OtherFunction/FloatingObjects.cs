@@ -14,6 +14,7 @@ public class FloatingObjects : MonoBehaviour
     [Tooltip("It will auto search the object with (WeatherStaion tag)")]
     public SingletonWeatherStationData m_WeatherData;
 
+
     private float radian = 0;//弧度
     private float perRadian = 0.2f;//每次变化的弧度
     private float radius = 0.05f;//半径
@@ -28,6 +29,7 @@ public class FloatingObjects : MonoBehaviour
         {
             m_WeatherData = GameObject.FindWithTag("WeatherStation").GetComponent<SingletonWeatherStationData>();
         }
+
     }
 
     void Start()

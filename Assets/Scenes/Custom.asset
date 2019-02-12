@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4ec900128fbff24683f8f2aac8c2192, type: 3}
   m_Name: Custom
   m_EditorClassIdentifier: 
-  WeatherTypeName: New Weather Type
+  WeatherTypeName: Custom Weather Station
   SunIntensity: 1
   MoonIntensity: 1
   MinimumFogLevel: 300
@@ -35,10 +35,10 @@ MonoBehaviour:
   UseWeatherSound: 1
   UseWeatherEffect: 1
   UseAdditionalWeatherEffect: 1
-  SpecialWeatherType: 1
-  Season: 0
-  CloudLevel: 0
-  TemperatureType: 1
+  SpecialWeatherType: 0
+  Season: 1
+  CloudLevel: 2
+  TemperatureType: 2
   ShaderControl: 2
   UseLightning: 1
   CustomizeWeatherIcon: 1

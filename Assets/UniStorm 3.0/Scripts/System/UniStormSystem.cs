@@ -136,6 +136,7 @@ using UnityEngine.Events;
         Coroutine CloudCoroutine, FogCoroutine, WeatherEffectCoroutine, AdditionalWeatherEffectCoroutine, ParticleFadeCoroutine;
         Coroutine AdditionalParticleFadeCoroutine, SunCoroutine, MoonCoroutine, WindCoroutine, SoundInCoroutine, SoundOutCoroutine;
         Coroutine LightningCloudsCoroutine, ColorCoroutine, CloudHeightCoroutine, RainShaderCoroutine, SnowShaderCoroutine;
+        public bool isDontChangeWindZonInUnistorm = false;
         public WindZone UniStormWindZone;
         public GameObject m_SoundTransform;
         public GameObject m_EffectsTransform;
@@ -626,7 +627,8 @@ using UnityEngine.Events;
             m_CloudDomeMaterial.SetFloat("_CloudCover", m_ReceivedCloudValue);
             RenderSettings.fogDensity = CurrentWeatherType.FogDensity;
             CurrentFogAmount = RenderSettings.fogDensity;
-            UniStormWindZone.windMain = CurrentWeatherType.WindIntensity;
+            if(!isDontChangeWindZonInUnistorm)
+                UniStormWindZone.windMain = CurrentWeatherType.WindIntensity;
             CurrentWindIntensity = CurrentWeatherType.WindIntensity;
             SunIntensity = CurrentWeatherType.SunIntensity;
             MoonIntensity = CurrentWeatherType.MoonIntensity;
@@ -1994,7 +1996,8 @@ using UnityEngine.Events;
             while ((CurrentValue >= MinValue && FadingOut) || (CurrentValue <= MaxValue && !FadingOut))
             {
                 CurrentValue += Time.deltaTime * m_LocalTransitionSpeed;
-                UniStormWindZone.windMain = CurrentValue;
+                if (!isDontChangeWindZonInUnistorm)
+                    UniStormWindZone.windMain = CurrentValue;
                 CurrentWindIntensity = CurrentValue;
 
                 yield return null;

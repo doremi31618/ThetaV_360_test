@@ -129,7 +129,8 @@ public class SingletonWeatherStationData : MonoBehaviour
 
     [Header("遊戲物件參數")]
     public GameObject Balloon;
-    public GameObject GrassInstance;
+    public Grass grass;
+    public UniStormSystem unistorm;
     public WindZone treeWindZone;
     /*
     public float OneHourRainFall;
@@ -156,32 +157,34 @@ public class SingletonWeatherStationData : MonoBehaviour
         }
     }
 
-    Grass grass;
-    UniStormSystem unistorm;
+
+
     #endregion
     #region Unity funtion
 
     private void Awake()
     {
-        if (treeWindZone == null)
-        {
-            treeWindZone = GameObject.Find("UniStorm Windzone").GetComponent<WindZone>();
-        }
+        
     }
 
     // Use this for initialization
     void Start()
     {
+        //Initialize stage
         jObject = null;
-        grass = GrassInstance.GetComponent<Grass>();
-        unistorm = GameObject.FindWithTag("UniStorm").GetComponent<UniStormSystem>();
+        if(grass == null)
+            grass = GameObject.Find("GrassShader").GetComponent<Grass>();
 
+        if(unistorm == null)
+            unistorm = GameObject.FindWithTag("UniStorm").GetComponent<UniStormSystem>();
+        unistorm.isDontChangeWindZonInUnistorm = true;
+        unistorm.UniStormWindZone = treeWindZone;
         if(Balloon == null)
         {
             Balloon = new GameObject();
             Balloon.AddComponent<FloatingObjects>();
-
         }
+
 
 
         if (isUseWeatherStaion)
@@ -250,10 +253,13 @@ public class SingletonWeatherStationData : MonoBehaviour
         grass.rotationNoiseAxis = new Vector3(
             Mathf.Sin(_WindDirection * Mathf.Deg2Rad),0,
             Mathf.Cos(_WindDirection * Mathf.Deg2Rad));
-
+        unistorm.UniStormWindZone.transform.eulerAngles = new Vector3(0,_WindDirection,0);
         grass.rotationNoiseSpeed = WindSpeedToRotationNoiseSpeed(windLevel);
         AdjustRandomPitchAndNoiseToRandomPitch(windLevel);
+
     }
+
+
     void AdjustRandomPitchAndNoiseToRandomPitch(Beaufort_scale _windLevel)
     {
         float _randomPitchAngle = 0;
@@ -281,7 +287,7 @@ public class SingletonWeatherStationData : MonoBehaviour
             _noisePitchAngle =Mathf.SmoothStep(45,60, ((float)_windLevel- 9) / 3f);
 
         }
-
+        unistorm.UniStormWindZone.windMain = (int)_windLevel / 2;
         grass.randomPitchAngle = _randomPitchAngle;
         grass.noisePitchAngle = _noisePitchAngle;
     }
