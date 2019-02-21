@@ -25,16 +25,19 @@ public class Cable_Procedural_Simple : MonoBehaviour {
 	[SerializeField] float swayYMultiplier = .5f;
 	//How fast the cable will go back and forth per second.
 	[SerializeField] float swayFrequency = 1;
+    [Range(0.1f,0.8f)][SerializeField] float maxDistance = 0.8f;
+    FloatingObjects m_FloatingObjects;
 
 
 	//These are used later for calculations
 	Vector3 vectorFromStartToEnd;
 	Vector3 sagDirection;
 	float swayValue;
-
+    bool lockEndposition = false;
 	void Start () 
 	{
 		line = GetComponent<LineRenderer>();
+        m_FloatingObjects = GetComponent<FloatingObjects>();
 
 		line.positionCount = pointsInLineRenderer;
 
@@ -43,6 +46,7 @@ public class Cable_Procedural_Simple : MonoBehaviour {
 
 		//Start animation at random times
 		swayValue = Random.Range(0, 3.14f);
+
 	}
 	
 
@@ -50,10 +54,16 @@ public class Cable_Procedural_Simple : MonoBehaviour {
 	void Update () 
 	{
 		Animate();
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            lockEndposition = true;
+            m_FloatingObjects.floatingUp = true;
+        }
 	}
 
 	void Animate()
 	{
+        float currentDistance = 0;
 		if(!endPointTransform)
 		{
 			Debug.LogError("No Endpoint Transform assigned to Cable_Procedural component attached to " + gameObject.name);
@@ -62,14 +72,22 @@ public class Cable_Procedural_Simple : MonoBehaviour {
 		{
 			//Get direction Vector.
 			vectorFromStartToEnd = endPointTransform.position - transform.position;
-			//Setting the Start object to look at the end will be used for making the wind be perpendicular to the cable later.
-			transform.forward = vectorFromStartToEnd.normalized;
-		}
 			
 
+            //Setting the Start object to look at the end will be used for making the wind be perpendicular to the cable later.
+			transform.forward = vectorFromStartToEnd.normalized;
+
+            currentDistance = Mathf.Abs(Vector3.Distance(transform.position, endPointTransform.position));
+            //Debug.Log(currentDistance);
+		}
+
+        float _maxDistance = maxDistance;
 		//what point is being calculated
 		int i = 0;
-
+        if(currentDistance > _maxDistance || lockEndposition)
+        {
+            endPointTransform.position = transform.position + Vector3.ClampMagnitude(transform.forward,_maxDistance);
+        }
 		swayValue += swayFrequency * Time.deltaTime;
 
 		//Clamp the wind value to stay within a cirlce's radian limits.

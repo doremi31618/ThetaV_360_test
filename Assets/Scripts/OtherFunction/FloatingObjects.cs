@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-[RequireComponent(typeof(MeshFilter),typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter),typeof(MeshRenderer),typeof(Cable_Procedural_Simple))]
 public class FloatingObjects : MonoBehaviour
 {
     
-    [Range(5,6)]public float floatingSpeed = 5.5f;
-
+    [Range(0,6)]public float floatingSpeed = 3f;
+    float forwardSpeed = 0;
     //Range(0,10)]public int windLevel = 0;
 
     [Tooltip("以氣象站為中心的方向")]
@@ -20,8 +20,9 @@ public class FloatingObjects : MonoBehaviour
     private float radius = 0.05f;//半径
     private Vector3 oldPos;//开始时候的坐标
     public bool disabledRot = true;
-
     public bool floatingUp = true;
+
+    //[Range(0.1f,2f)]public float maxLineDistance = 1.5f;
 
     private void Awake()
     {
@@ -47,25 +48,30 @@ public class FloatingObjects : MonoBehaviour
         if(floatingUp)
         {
             Vector3 movingTowardDir = new Vector3(Mathf.Sin(Mathf.Deg2Rad * windDirection), 0, Mathf.Cos(Mathf.Deg2Rad * windDirection));
-            movingTowardDir = movingTowardDir.normalized * floatingSpeed * Time.deltaTime;
+            movingTowardDir = movingTowardDir.normalized * forwardSpeed * Time.deltaTime;
             movingTowardDir.y = floatingSpeed * Time.deltaTime;
-            this.transform.Translate(movingTowardDir);
+            this.transform.parent.Translate(movingTowardDir);
+
         }
         else
         {
             radian += perRadian;//弧度每次加0.03
-            float dy = Mathf.Cos(radian) * radius;//dy定义的是针对y轴的变量，也可以使用sin，找到一个合适的值就可以
-            transform.position = oldPos + new Vector3(0, dy, 0);
+            //Vector3 movingTowardDir = new Vector3(Mathf.Sin(Mathf.Deg2Rad * windDirection), 0, Mathf.Cos(Mathf.Deg2Rad * windDirection));
+            float dx = Mathf.Sin(Mathf.Deg2Rad * windDirection)* (radius * Mathf.Cos(radian * forwardSpeed * 0.1f) * forwardSpeed * 0.1f) ;
+            float dz = Mathf.Cos(Mathf.Deg2Rad * windDirection)* (radius) * Mathf.Cos(radian * forwardSpeed * 0.1f)  * forwardSpeed * 0.1f;
+            float dy = Mathf.Cos(radian) * radius  *0.1f;//dy定义的是针对y轴的变量，也可以使用sin，找到一个合适的值就可以
+            transform.position = oldPos + new Vector3(dz, dy, dx);
+            //Debug.Log(dx+ "  "+ dy+"  "+ dy);
         }
 
 
-        if (disabledRot)
+        if (!disabledRot)
             transform.localEulerAngles += new Vector3(0, 1f, 0);
     }
 
     void GetWeatherStationData()
     {
-        floatingSpeed = m_WeatherData.AverageWindSpeed;
+        forwardSpeed = m_WeatherData.AverageWindSpeed;
         windDirection = m_WeatherData.WindDirction;
     }
 }
