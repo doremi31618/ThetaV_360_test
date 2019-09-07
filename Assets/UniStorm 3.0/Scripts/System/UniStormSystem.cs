@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+[RequireComponent(typeof(CustomWeatherData))]
     public class UniStormSystem : MonoBehaviour
     {
 
@@ -188,6 +189,7 @@ using UnityEngine.Events;
         Renderer m_CloudDomeRenderer;
         Renderer m_CloudDomeLightningRenderer;
         Material m_CloudDomeMaterial;
+        public bool isUseCustomSkyboxMaterial;
         Material m_SkyBoxMaterial;
         Renderer m_StarsRenderer;
         Material m_StarsMaterial;
@@ -541,7 +543,8 @@ using UnityEngine.Events;
             m_SunLight.intensity = SunIntensityCurve.Evaluate((float)Hour) * SunIntensity;
             m_MoonLight.intensity = MoonIntensityCurve.Evaluate((float)Hour) * MoonIntensity * MoonPhaseIntensity;
 
-            m_SkyBoxMaterial = (Material)Resources.Load("UniStorm Skybox") as Material;
+            if(!isUseCustomSkyboxMaterial)m_SkyBoxMaterial = (Material)Resources.Load("UniStorm Skybox") as Material;
+            
             RenderSettings.skybox = m_SkyBoxMaterial;
             m_SkyBoxMaterial.SetFloat("_AtmosphereThickness", AtmosphereThickness.Evaluate((float)Hour));
             m_SkyBoxMaterial.SetColor("_NightSkyTint", SkyTintColor.Evaluate((float)Hour));
@@ -2261,3 +2264,8 @@ using UnityEngine.Events;
         }
     }
 
+public class CustomWeatherData : MonoBehaviour
+{
+    public bool isUseCustomSkyboxMaterial;
+    public Material m_SkyBoxMaterial;
+}

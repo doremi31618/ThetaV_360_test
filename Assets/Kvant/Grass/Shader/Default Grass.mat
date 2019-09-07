@@ -4,7 +4,7 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Default Grass
   m_Shader: {fileID: 4800000, guid: da73fcaab82534881adec3f5f772b88a, type: 3}
@@ -44,14 +44,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _ColorMode: 1
-    - _HeightToOcc: 5.263158
+    - _HeightToOcc: 4
     - _Metallic: 0
     - _NormalScale: 0
-    - _OccExp: 1
-    - _OccHeight: 0.19
-    - _OccToColor: 0.418
+    - _OccExp: 1.8
+    - _OccHeight: 0.25
+    - _OccToColor: 0.34
     - _OcclusionStr: 1
-    - _Smoothness: 0.635
+    - _Smoothness: 0.33
     m_Colors:
-    - _Color: {r: 0.17817727, g: 0.49056602, b: 0.24524377, a: 1}
-    - _Color2: {r: 0.55802774, g: 0.7735849, b: 0.14231044, a: 1}
+    - _Color: {r: 0.70612305, g: 0.764151, b: 0.0036044943, a: 1}
+    - _Color2: {r: 0.16381864, g: 0.7924528, b: 0.063545756, a: 1}
